@@ -19,11 +19,15 @@ class TicTacToeGame:
         self.current_player = self.player  # Start with the player
         self.game_over = False  # Flag to indicate if the game is over
 
+        # Initialize scores
+        self.player_score = 0
+        self.computer_score = 0
+        self.update_score_labels() # Update the score labels initially
+
         # Connect button clicks to the game logic
         for i in range(3):
             for j in range(3):
                 self.gui.buttons[i][j].config(command=lambda row=i, col=j: self.button_click(row, col))
-                
 
         # Connect the restart button to the restart_game method
         self.gui.restart_button.config(command=self.restart_game)
@@ -41,7 +45,7 @@ class TicTacToeGame:
                     self.computer.move(self.game_board, self.gui)  # Computer move
                     self.current_player = self.player  # Switch back to player
 
-            self.check_for_winner()  # Check for a winner after each move
+            self.check_for_winner()  # Call the function to check for a winner!
 
     def check_for_winner(self):
         """Checks for a winner or a draw."""
@@ -76,7 +80,18 @@ class TicTacToeGame:
             self.gui.game_message.set("It's a tie!")
         else:
             self.gui.game_message.set(f"{winner} wins!")
-            
+            if winner == "X":
+                self.player_score += 1
+            else:
+                self.computer_score += 1
+        self.update_score_labels()
+
+    def update_score_labels(self):
+        """Updates the score labels in the GUI."""
+
+        self.gui.player_score.set(f"You: {self.player_score}")
+        self.gui.computer_score.set(f"Computer: {self.computer_score}")
+
     def restart_game(self):
         """Restarts the game."""
 
