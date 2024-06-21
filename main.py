@@ -23,6 +23,10 @@ class TicTacToeGame:
         for i in range(3):
             for j in range(3):
                 self.gui.buttons[i][j].config(command=lambda row=i, col=j: self.button_click(row, col))
+                
+
+        # Connect the restart button to the restart_game method
+        self.gui.restart_button.config(command=self.restart_game)
 
     def button_click(self, row, col):
         """Handles button clicks on the game board."""
@@ -72,6 +76,23 @@ class TicTacToeGame:
             self.gui.game_message.set("It's a tie!")
         else:
             self.gui.game_message.set(f"{winner} wins!")
+            
+    def restart_game(self):
+        """Restarts the game."""
+
+        self.game_board = [
+            ["", "", ""],
+            ["", "", ""],
+            ["", "", ""]
+        ]
+        self.current_player = self.player
+        self.game_over = False
+        self.gui.game_message.set("")  # Clear the game message
+
+        # Reset the button texts in the GUI
+        for i in range(3):
+            for j in range(3):
+                self.gui.buttons[i][j].config(text="")
 
 if __name__ == "__main__":
     root = tk.Tk()
