@@ -50,40 +50,51 @@ class TicTacToeGame:
     def check_for_winner(self):
         """Checks for a winner or a draw."""
 
-        # Check rows
-        for row in self.game_board:
-            if row[0] == row[1] == row[2] and row[0] != "":
-                self.declare_winner(row[0])
-                return
+        # --- Winning Patterns (for coloring) ---
+        winning_patterns = [
+            [(0, 0), (0, 1), (0, 2)],  # Row 1
+            [(1, 0), (1, 1), (1, 2)],  # Row 2
+            [(2, 0), (2, 1), (2, 2)],  # Row 3
+            [(0, 0), (1, 0), (2, 0)],  # Column 1
+            [(0, 1), (1, 1), (2, 1)],  # Column 2
+            [(0, 2), (1, 2), (2, 2)],  # Column 3
+            [(0, 0), (1, 1), (2, 2)],  # Diagonal 1
+            [(0, 2), (1, 1), (2, 0)]   # Diagonal 2
+        ]
 
-        # Check columns
-        for col in range(3):
-            if self.game_board[0][col] == self.game_board[1][col] == self.game_board[2][col] and self.game_board[0][col] != "":
-                self.declare_winner(self.game_board[0][col])
+        # Check for a winner and get the winning pattern
+        for pattern in winning_patterns:
+            a, b, c = pattern[0], pattern[1], pattern[2]
+            if self.game_board[a[0]][a[1]] == self.game_board[b[0]][b[1]] == self.game_board[c[0]][c[1]] and self.game_board[a[0]][a[1]] != "":
+                self.declare_winner(self.game_board[a[0]][a[1]], pattern)  # Pass the pattern to declare_winner
                 return
-
-        # Check diagonals
-        if (self.game_board[0][0] == self.game_board[1][1] == self.game_board[2][2] or
-            self.game_board[0][2] == self.game_board[1][1] == self.game_board[2][0]) and self.game_board[1][1] != "":
-            self.declare_winner(self.game_board[1][1])
-            return
 
         # Check for a draw
         if all(cell != "" for row in self.game_board for cell in row):
-            self.declare_winner("Tie")
+            self.declare_winner("Tie", None)  # No winning pattern for a tie
 
-    def declare_winner(self, winner):
-        """Declares the winner and updates the game state."""
+    def declare_winner(self, winner, winning_pattern):
+        """Declares the winner, updates the game state, and colors the board."""
 
         self.game_over = True
         if winner == "Tie":
             self.gui.game_message.set("It's a tie!")
+            # Color the entire board red for a tie
+            for i in range(3):
+                for j in range(3):
+                    self.gui.buttons[i][j].config(bg="red")
         else:
             self.gui.game_message.set(f"{winner} wins!")
             if winner == "X":
                 self.player_score += 1
             else:
                 self.computer_score += 1
+
+            # Color the winning sequence
+            if winning_pattern:
+                for row, col in winning_pattern:
+                    self.gui.buttons[row][col].config(bg="cyan")  # Change button background to cyan
+
         self.update_score_labels()
 
     def update_score_labels(self):
@@ -104,10 +115,10 @@ class TicTacToeGame:
         self.game_over = False
         self.gui.game_message.set("")  # Clear the game message
 
-        # Reset the button texts in the GUI
+        # Reset the button texts and colors in the GUI
         for i in range(3):
             for j in range(3):
-                self.gui.buttons[i][j].config(text="")
+                self.gui.buttons[i][j].config(text="", bg="SystemButtonFace")  # Reset to default color
 
 if __name__ == "__main__":
     root = tk.Tk()
